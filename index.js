@@ -1,28 +1,36 @@
 const express = require("express");
-const app = express();
-require("dotenv").config();
+const dotenv = require("dotenv");
 const connectDB = require("./database/database");
-const productRoutes = require("./routes/product.route");
-const RequestLogger = require("./middleWare/logger");
-const cors = require("cors");
-const errorHandler = require("./middleWare/errorHandler");
+const cors = require('cors');
+const errorHandler = require("./middleware/errorHandler");
+const requestLogger = require("./middleware/requestLogger");
+
+dotenv.config();
+connectDB();
+
+const app = express();
 
 app.use(cors());
-app.use(RequestLogger);
+app.use(express.json());
+app.use(requestLogger);
 
-(async () => {
-  await connectDB();
+// Routes
+app.use("/api/products", require("./routes/product.route"));
+app.use("/api/users", require("./routes/user.route"));
+app.use("/api/admin", require("./routes/admin.route"));
 
-  app.use(express.json());
+app.get("/", (req, res) => {
+  res.send("API is running...");
+});
 
-  // Routes
-  app.use("/api", productRoutes);
-  app.get("/api", (req, res) => {
-    res.status(200).json({ message: "Api found" });
-  });
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: "Route not found" });
+});
 
-  const PORT = process.env.PORT || 3000;
+// Global error handler
 app.use(errorHandler);
 
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-})();
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

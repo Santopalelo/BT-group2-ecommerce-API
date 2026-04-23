@@ -5,7 +5,6 @@ const productSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
-      index: true // enables search
     },
     price: {
       type: Number,
@@ -28,10 +27,6 @@ const productSchema = new mongoose.Schema(
 );
 
 // Text index for search
-productSchema.index({ name: "text", description: "text" });
+productSchema.index({ name: "text" });
 
 module.exports = mongoose.model("Product", productSchema);
-
-
-
-

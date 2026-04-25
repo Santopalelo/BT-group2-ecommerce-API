@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const UserModel = require('../models/user.model');
+const AdminModel = require('../models/admin.model.js'); // add this
 
 const requireAuth = async (req, res, next) => {
     const authHeader = req.header('Authorization');
@@ -12,7 +13,13 @@ const requireAuth = async (req, res, next) => {
     try {
         const payload = jwt.verify(token, process.env.JWT_SECRET);
 
-        const user = await UserModel.findById(payload.userId);
+        let user;
+        if (payload.role === 'admin') {
+            user = await AdminModel.findById(payload.userId); // ✅ check admin collection
+        } else {
+            user = await UserModel.findById(payload.userId);  // ✅ check user collection
+        }
+
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }

@@ -1,11 +1,11 @@
 const express = require("express");
 const dotenv = require("dotenv");
+dotenv.config();
 const connectDB = require("./database/database");
 const cors = require('cors');
 const errorHandler = require("./middleware/errorHandler");
-const requestLogger = require("./middleware/requestLogger");
+const requestLogger = require("./middleWare/logger.js");
 
-dotenv.config();
 connectDB();
 
 const app = express();
@@ -16,8 +16,8 @@ app.use(requestLogger);
 
 // Routes
 app.use("/api/products", require("./routes/product.route"));
-app.use("/api/users", require("./routes/user.route"));
-app.use("/api/admin", require("./routes/admin.route"));
+app.use("/api/users", require("./routes/user.routes"));
+app.use("/api/admin", require("./routes/admin.routes"));
 
 app.get("/", (req, res) => {
   res.send("API is running...");

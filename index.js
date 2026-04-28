@@ -28,8 +28,8 @@ app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
 
-// Global error handler
-app.use(errorHandler);
+  const PORT = process.env.PORT || 3000;
+  app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 

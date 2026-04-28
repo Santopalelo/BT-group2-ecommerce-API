@@ -1,21 +1,20 @@
 const express = require("express");
 const router = express.Router();
 const {
-  validateProduct,
-  validateProductUpdate,
-} = require("../Validation/product.validation.js");
-const {
   createProduct,
   getProducts,
   getProductById,
   updateProduct,
-  deleteProduct,
+  deleteProduct
 } = require("../controllers/product.controller");
+const requireAuth = require("../middleware/requireAuth");
+const requireAdmin = require("../middleware/requireAdmin"); 
+const { validateProduct, validateProductUpdate } = require("../Validation/product.validation.js");
 
-router.post("/products", validateProduct, createProduct);
-router.get("/products", getProducts);
-router.get("/products/:id", getProductById);
-router.put("/products/:id", validateProductUpdate, updateProduct);
-router.delete("/products/:id", deleteProduct);
+router.post("/", requireAuth, requireAdmin, validateProduct, createProduct);     // admin only
+router.get("/", requireAuth, getProducts);                                        //  any user
+router.get("/:id", requireAuth, getProductById);                                  //  any user
+router.put("/:id", requireAuth, requireAdmin, validateProductUpdate, updateProduct); //  admin only
+router.delete("/:id", requireAuth, requireAdmin, deleteProduct);                 //  admin only
 
 module.exports = router;

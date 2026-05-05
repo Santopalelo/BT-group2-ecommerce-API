@@ -23,11 +23,16 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
   },
   { timestamps: true },
 );
 
 // Text index for search
 productSchema.index({ name: "text", description: "text" });
+const productModel = mongoose.model("product", productSchema)
 
-module.exports = mongoose.model("Product", productSchema);
+module.exports = productModel

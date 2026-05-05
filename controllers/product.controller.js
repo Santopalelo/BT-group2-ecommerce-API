@@ -4,7 +4,12 @@ const Product = require("../models/product.model");
 // CREATE
 exports.createProduct = async (req, res) => {
   try {
-    const product = await Product.create(req.validatedData);
+    const productData = {
+      ...req.validatedData,
+      createdBy: req.user._id || req.user.id,
+    };
+
+    const product = await Product.create(productData);
     res.status(201).json(product);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -39,9 +44,7 @@ exports.getProducts = async (req, res) => {
     }
 
     // Pagination
-    const products = await productsQuery
-      .skip((page - 1) * limit)
-      .limit(limit);
+    const products = await productsQuery.skip((page - 1) * limit).limit(limit);
 
     res.json(products);
   } catch (err) {
@@ -57,8 +60,7 @@ exports.getProductById = async (req, res) => {
     }
 
     const product = await Product.findById(req.params.id);
-    if (!product)
-      return res.status(404).json({ error: "Product not found" });
+    if (!product) return res.status(404).json({ error: "Product not found" });
 
     res.json(product);
   } catch (err) {
@@ -73,15 +75,15 @@ exports.updateProduct = async (req, res) => {
       return res.status(400).json({ error: "Invalid product ID" });
     }
 
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      req.validatedData,
-      { new: true, runValidators: true }
-    );
+    const product = req.product || (await Product.findById(req.params.id));
 
-    if (!product)
-      return res.status(404).json({ error: "Product not found" });
+    if (!product) return res.status(404).json({ error: "Product not found" });
 
+    Object.assign(product, req.validatedData);
+    await product.save();
+
+    console.log(req.user);
+    
     res.json(product);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -95,10 +97,10 @@ exports.deleteProduct = async (req, res) => {
       return res.status(400).json({ error: "Invalid product ID" });
     }
 
-    const product = await Product.findByIdAndDelete(req.params.id);
-    if (!product)
-      return res.status(404).json({ error: "Product not found" });
+    const product = req.product || (await Product.findById(req.params.id));
+    if (!product) return res.status(404).json({ error: "Product not found" });
 
+    await product.deleteOne();
     res.json({ message: "Product deleted" });
   } catch (err) {
     res.status(500).json({ error: err.message });

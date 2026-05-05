@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { removeListener } = require("./product.model");
 
 const userSchema = mongoose.Schema({
     name: {
@@ -14,6 +15,10 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    role:{
+        default: "user",
+        type: String
+    }
 }, { timestamps: true });
 
 const UserModel = mongoose.model("User", userSchema);

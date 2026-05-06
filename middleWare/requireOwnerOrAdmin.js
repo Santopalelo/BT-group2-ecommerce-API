@@ -22,9 +22,8 @@ const requireOwnerOrAdmin = async (req, res, next) => {
     }
 
     req.product = product;
-    next();
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    next(err);
   }
 };
 

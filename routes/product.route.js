@@ -7,7 +7,7 @@ const {
   updateProduct,
   deleteProduct
 } = require("../controllers/product.controller");
-const requireAuth = require("../middleware/requireAuth");
+const requireAuth = require("../middleWare/requireAuth");
 const requireOwnerOrAdmin = require("../middleWare/requireOwnerOrAdmin.js");
 const { validateProduct, validateProductUpdate } = require("../Validation/product.validation.js");
 router.use(requireAuth); // all routes require authentication
